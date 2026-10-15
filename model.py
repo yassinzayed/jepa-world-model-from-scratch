@@ -192,8 +192,23 @@ def init_linear_probe(latent_dim: int = 32, state_dim: int = 2, seed: int = 0) -
         'b': bias
     }
 
-# Step 28 - train_linear_probe (not yet solved)
-# TODO: implement
+# Step 28 - train_linear_probe
+def train_linear_probe(embeddings: torch.Tensor, states: torch.Tensor, probe_params: dict, num_steps: int = 100, lr: float = 1e-2) -> dict:
+    # TODO: Train the linear probe via MSE regression from frozen embeddings to true agent states.
+    w, b = probe_params['w'].clone().detach().requires_grad_(True), probe_params['b'].clone().detach().requires_grad_(True)
+    for i in range(num_steps):
+        pred = embeddings @ w + b
+        loss = torch.mean((pred-states)**2)
+        loss.backward()
+        with torch.no_grad():
+            w -= lr*w.grad
+            b -= lr*b.grad
+        w.grad.zero_()
+        b.grad.zero_()
+    return {
+        'w': w.detach().clone(),
+        'b': b.detach().clone()
+    }
 
 # Step 29 - probe_state_recovery (not yet solved)
 # TODO: implement
