@@ -42,8 +42,12 @@ def render_observation(state: torch.Tensor, room_size: int = 8) -> torch.Tensor:
     rendering[0, int(state[1]), int(state[0])] = 1.0
     return rendering
 
-# Step 4 - env_reset (not yet solved)
-# TODO: implement
+# Step 4 - env_reset
+def env_reset(room_size: int = 8, seed: int | None = None) -> tuple[torch.Tensor, torch.Tensor]:
+    # TODO: Reset the environment by sampling a new state and its observation.
+    state = init_env_state(room_size, seed)
+    observation = render_observation(state, room_size)
+    return (state, observation)
 
 # Step 5 - env_step (not yet solved)
 # TODO: implement
