@@ -55,6 +55,15 @@ def env_step(state: torch.Tensor, action: int, room_size: int = 8) -> tuple[torc
 def collect_random_transitions(num_transitions: int, room_size: int = 8, seed: int = 0) -> dict:
     # TODO: collect a dataset of (obs, action, next_obs, state, next_state) transitions...
     generator = torch.Generator().manual_seed(seed)
+    state, observation = env_reset(room_size, seed=seed)
+    if num_transitions == 0:
+        return {
+            "observations": observation.unsqueeze(0)[:0],
+            "actions": torch.empty((0,), dtype=torch.int64),
+            "next_observations": observation.unsqueeze(0)[:0],
+            "states": state.unsqueeze(0)[:0],
+            "next_states": state.unsqueeze(0)[:0]
+        }
     observations, actions, next_observations, states, next_states = (
         [],
         [],
@@ -63,7 +72,6 @@ def collect_random_transitions(num_transitions: int, room_size: int = 8, seed: i
         []
     )
     transitions = torch.randint(0, 4, (num_transitions,), generator=generator)
-    state, observation = env_reset(room_size, seed=seed)
     for i in transitions:
         next_state, next_observation = env_step(state=state, action=int(i.item()), room_size=room_size)
         observations.append(observation)
