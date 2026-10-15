@@ -93,8 +93,21 @@ def build_transition_dataset(num_transitions: int = 512, room_size: int = 8, see
     # TODO: Build a JEPA training-ready transition dataset by collecting random transitions...
     return collect_random_transitions(num_transitions, room_size, seed)
 
-# Step 8 - init_encoder_params (not yet solved)
-# TODO: implement
+# Step 8 - init_encoder_params
+def init_encoder_params(obs_channels: int = 1, room_size: int = 8, latent_dim: int = 32, seed: int = 0) -> dict:
+    # TODO: Initialize parameters of a small CNN encoder that maps pixel observations to latent embeddings.
+    torch.manual_seed(seed)
+    shape_w1 = (16, 1, 3, 3)
+    shape_w2 = (32, 16, 3, 3)
+    shape_fc = (32, 512)
+    return {
+        'conv1_w': torch.randn(shape_w1, requires_grad=True)*(0.1),
+        'conv1_b': torch.zeros(16, requires_grad=True),
+        'conv2_w': torch.randn(shape_w2, requires_grad=True)*(0.1),
+        'conv2_b': torch.zeros(32, requires_grad=True),
+        'fc_w': torch.randn(shape_fc, requires_grad=True),
+        'fc_b': torch.zeros(128, requires_grad=True)
+    }
 
 # Step 9 - encoder_forward (not yet solved)
 # TODO: implement
@@ -120,8 +133,11 @@ def build_transition_dataset(num_transitions: int = 512, room_size: int = 8, see
 # Step 16 - predict_next_embedding (not yet solved)
 # TODO: implement
 
-# Step 17 - prediction_loss (not yet solved)
-# TODO: implement
+# Step 17 - prediction_loss
+def prediction_loss(predicted: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    # TODO: Compute the JEPA prediction loss as mean squared error...
+    residual = (predicted-target)**2
+    return torch.mean(residual)
 
 # Step 18 - variance_loss (not yet solved)
 # TODO: implement
