@@ -181,8 +181,16 @@ def collapse_metric(embeddings: torch.Tensor) -> torch.Tensor:
 # Step 26 - multi_step_prediction_error (not yet solved)
 # TODO: implement
 
-# Step 27 - init_linear_probe (not yet solved)
-# TODO: implement
+# Step 27 - init_linear_probe
+def init_linear_probe(latent_dim: int = 32, state_dim: int = 2, seed: int = 0) -> dict:
+    # TODO: Initialize a linear probe that maps latent embeddings to true agent state (x, y).
+    torch.manual_seed(seed)
+    weights = torch.randn(state_dim, latent_dim)*0.01
+    bias = torch.zeros(state_dim)
+    return {
+        'w': weights,
+        'b': bias
+    }
 
 # Step 28 - train_linear_probe (not yet solved)
 # TODO: implement
