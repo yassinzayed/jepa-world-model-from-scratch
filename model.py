@@ -35,8 +35,12 @@ def apply_action(state: torch.Tensor, action: int, room_size: int = 8) -> torch.
             state_new[i] = 0
     return state_new
 
-# Step 3 - render_observation (not yet solved)
-# TODO: implement
+# Step 3 - render_observation
+def render_observation(state: torch.Tensor, room_size: int = 8) -> torch.Tensor:
+    # TODO: Render a (1, room_size, room_size) float32 obs with agent pixel 1.0...
+    rendering = torch.zeros((1, room_size, room_size))
+    rendering[0, int(state[1]), int(state[0])] = 1.0
+    return rendering
 
 # Step 4 - env_reset (not yet solved)
 # TODO: implement
