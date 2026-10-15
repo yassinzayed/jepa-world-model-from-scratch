@@ -21,19 +21,14 @@ def init_env_state(room_size: int = 8, seed: int | None = None) -> torch.Tensor:
 def apply_action(state: torch.Tensor, action: int, room_size: int = 8) -> torch.Tensor:
     # TODO: Apply a discrete action to the agent state with wall clamping.
     if action == 0:
-        state_new = torch.tensor([state[0], state[1]-1])
+        state_new = torch.stack([state[0], state[1]-1])
     elif action == 1:
-        state_new = torch.tensor([state[0], state[1]+1])
+        state_new = torch.stack([state[0], state[1]+1])
     elif action == 2:
-        state_new = torch.tensor([state[0]-1, state[1]])
+        state_new = torch.stack([state[0]-1, state[1]])
     elif action == 3:
-        state_new = torch.tensor([state[0]+1, state[1]])
-    for i in range(len(state_new)):
-        if state_new[i] >= room_size:
-            state_new[i] = room_size-1
-        elif state_new[i] < 0:
-            state_new[i] = 0
-    return state_new
+        state_new = torch.stack([state[0]+1, state[1]])
+    return torch.clamp(state_new, 0, room_size - 1).to(state.dtype)
 
 # Step 3 - render_observation
 def render_observation(state: torch.Tensor, room_size: int = 8) -> torch.Tensor:
@@ -56,8 +51,34 @@ def env_step(state: torch.Tensor, action: int, room_size: int = 8) -> tuple[torc
     next_observation = render_observation(next_state, room_size)
     return (next_state, next_observation)
 
-# Step 6 - collect_random_transitions (not yet solved)
-# TODO: implement
+# Step 6 - collect_random_transitions
+def collect_random_transitions(num_transitions: int, room_size: int = 8, seed: int = 0) -> dict:
+    # TODO: collect a dataset of (obs, action, next_obs, state, next_state) transitions...
+    generator = torch.Generator().manual_seed(seed)
+    observations, actions, next_observations, states, next_states = (
+        [],
+        [],
+        [],
+        [],
+        []
+    )
+    transitions = torch.randint(0, 4, (num_transitions,), generator=generator)
+    state, observation = env_reset(room_size, seed=seed)
+    for i in transitions:
+        next_state, next_observation = env_step(state=state, action=int(i.item()), room_size=room_size)
+        observations.append(observation)
+        next_observations.append(next_observation)
+        states.append(state)
+        next_states.append(next_state)
+        state = next_state
+        observation = next_observation
+    return {
+        'observations': torch.stack(observations),
+        'actions': transitions,
+        'next_observations': torch.stack(next_observations),
+        'states': torch.stack(states),
+        'next_states': torch.stack(next_states)
+    }
 
 # Step 7 - build_transition_dataset (not yet solved)
 # TODO: implement
