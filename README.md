@@ -22,7 +22,7 @@ python scaffold.py
 - [ ] **10.** init_target_encoder
 - [ ] **11.** ema_update
 - [ ] **12.** encode_batch
-- [ ] **13.** init_predictor_params
+- [x] **13.** init_predictor_params
 - [ ] **14.** embed_action
 - [ ] **15.** predictor_forward
 - [ ] **16.** predict_next_embedding
@@ -39,7 +39,7 @@ python scaffold.py
 - [x] **27.** init_linear_probe
 - [x] **28.** train_linear_probe
 - [ ] **29.** probe_state_recovery
-- [ ] **30.** encode_goal
+- [x] **30.** encode_goal
 - [ ] **31.** latent_cost
 - [ ] **32.** sample_action_sequences
 - [ ] **33.** score_action_sequences
