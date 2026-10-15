@@ -138,8 +138,11 @@ def init_predictor_params(latent_dim: int = 32, action_dim: int = 4, hidden_dim:
         'fc2_b': fc2_b
     }
 
-# Step 14 - embed_action (not yet solved)
-# TODO: implement
+# Step 14 - embed_action
+def embed_action(actions: torch.Tensor, predictor_params: dict) -> torch.Tensor:
+    # TODO: Embed discrete actions into continuous vectors via a learned action embedding table.
+    weight_matrix = predictor_params['action_embed_w']
+    return weight_matrix[actions]
 
 # Step 15 - predictor_forward (not yet solved)
 # TODO: implement
