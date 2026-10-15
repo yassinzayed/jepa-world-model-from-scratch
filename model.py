@@ -28,7 +28,7 @@ def apply_action(state: torch.Tensor, action: int, room_size: int = 8) -> torch.
         state_new = torch.stack([state[0]-1, state[1]])
     elif action == 3:
         state_new = torch.stack([state[0]+1, state[1]])
-    return torch.clamp(state_new, 0, room_size - 1).to(state.dtype)
+    return torch.clamp(state_new, 0, room_size - 1)
 
 # Step 3 - render_observation
 def render_observation(state: torch.Tensor, room_size: int = 8) -> torch.Tensor:
