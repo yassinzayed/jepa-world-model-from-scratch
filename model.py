@@ -139,8 +139,12 @@ def prediction_loss(predicted: torch.Tensor, target: torch.Tensor) -> torch.Tens
     residual = (predicted-target)**2
     return torch.mean(residual)
 
-# Step 18 - variance_loss (not yet solved)
-# TODO: implement
+# Step 18 - variance_loss
+def variance_loss(embeddings: torch.Tensor, gamma: float = 1.0, eps: float = 1e-4) -> torch.Tensor:
+    # TODO: Compute VICReg variance hinge loss encouraging each dim std >= gamma.
+    std_dim = torch.sqrt(torch.var(embeddings, dim=0)+eps)
+    loss = torch.mean(torch.relu(gamma-std_dim))
+    return loss
 
 # Step 19 - covariance_loss (not yet solved)
 # TODO: implement
