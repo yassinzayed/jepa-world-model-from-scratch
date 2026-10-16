@@ -144,8 +144,14 @@ def embed_action(actions: torch.Tensor, predictor_params: dict) -> torch.Tensor:
     weight_matrix = predictor_params['action_embed_w']
     return weight_matrix[actions]
 
-# Step 15 - predictor_forward (not yet solved)
-# TODO: implement
+# Step 15 - predictor_forward
+def predictor_forward(embeddings: torch.Tensor, actions: torch.Tensor, predictor_params: dict) -> torch.Tensor:
+    # TODO: Implement predictor_forward, the forward pass of the action-conditioned dynamics predictor.
+    action_embeddings = embed_action(actions, predictor_params)
+    concat = torch.cat((embeddings, action_embeddings), dim=-1)
+    res1 = torch.relu(torch.nn.functional.linear(concat, predictor_params['fc1_w'], predictor_params['fc1_b']))
+    res2 = torch.nn.functional.linear(res1, predictor_params['fc2_w'], predictor_params['fc2_b'])
+    return res2
 
 # Step 16 - predict_next_embedding (not yet solved)
 # TODO: implement
