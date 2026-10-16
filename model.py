@@ -346,7 +346,24 @@ def train_linear_probe(embeddings: torch.Tensor, states: torch.Tensor, probe_par
 # Step 29 - probe_state_recovery
 def probe_state_recovery(dataset: dict, encoder_params: dict, probe_params: dict | None = None, num_probe_steps: int = 100) -> dict:
     # TODO: Encode observations, train linear probe, report state recovery metrics
-    pass
+    observations = dataset['observations']
+    embeddings = encode_batch(observations, encoder_params).detach()
+    states = torch.as_tensor(dataset['states'], dtype=embeddings.dtype)
+    D, K = embeddings.shape[-1], states.shape[-1]
+    if probe_params is None:
+        probe_params = init_linear_probe(latent_dim=D, state_dim=K, seed=0)
+    w = probe_params['w']
+    if w.shape == (K, D) and K != D:
+        w = w.T
+    trained = train_linear_probe(embeddings, states, {'w': w, 'b': probe_params['b']},
+                                 num_steps=num_probe_steps)
+    W = trained['w'].T.contiguous()
+    b = trained['b']
+    with torch.no_grad():
+        pred = embeddings @ W.T + b
+        mse = torch.mean((pred - states) ** 2).item()
+        mae = torch.mean(torch.abs(pred - states)).item()
+    return {'mse': mse, 'mean_abs_error': mae, 'probe_params': {'w': W, 'b': b}}
 
 # Step 30 - encode_goal
 def encode_goal(goal_state: torch.Tensor, encoder_params: dict, room_size: int = 8) -> torch.Tensor:
