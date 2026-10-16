@@ -35,7 +35,7 @@ python scaffold.py
 - [x] **23.** jepa_training_step
 - [x] **24.** train_jepa
 - [x] **25.** rollout_latent_dynamics
-- [ ] **26.** multi_step_prediction_error
+- [x] **26.** multi_step_prediction_error
 - [x] **27.** init_linear_probe
 - [x] **28.** train_linear_probe
 - [x] **29.** probe_state_recovery

@@ -297,8 +297,23 @@ def rollout_latent_dynamics(initial_embedding: torch.Tensor, actions: torch.Tens
         res = res.squeeze(1)
     return res
 
-# Step 26 - multi_step_prediction_error (not yet solved)
-# TODO: implement
+# Step 26 - multi_step_prediction_error
+def multi_step_prediction_error(dataset: dict, encoder_params: dict, target_params: dict, predictor_params: dict, horizon: int = 5, num_samples: int = 32) -> float:
+    # TODO: Evaluate multi-step latent prediction accuracy via mean MSE over samples
+    obs, action, next_obs = dataset['observations'], dataset['actions'], dataset['next_observations']
+    n = len(obs)
+    b = min(num_samples, n-horizon+1)
+    #if b <= 0:
+    #    raise ValueError()
+    with torch.no_grad():
+        ini_obs = obs[:b]
+        actions = torch.stack([action[i:i+horizon] for i in range(b)], dim=0)
+        future_obs = torch.stack([next_obs[i:i+horizon] for i in range(b)], dim=1)
+        ini_emb = encode_batch(ini_obs, encoder_params)
+        pred = rollout_latent_dynamics(ini_emb, actions, predictor_params)[1:]
+        true = encode_batch(future_obs.flatten(0, 1), target_params).reshape(horizon, b, -1)
+        res = torch.mean((pred - true)**2).item()
+    return res
 
 # Step 27 - init_linear_probe
 def init_linear_probe(latent_dim: int = 32, state_dim: int = 2, seed: int = 0) -> dict:
