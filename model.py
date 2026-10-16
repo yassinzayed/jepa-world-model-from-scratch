@@ -340,8 +340,10 @@ def latent_cost(latents, goal_embedding):
     # TODO: Compute squared L2 distance from each latent embedding to a goal embedding...
     return torch.sum(torch.square(latents-goal_embedding), dim=-1)
 
-# Step 32 - sample_action_sequences (not yet solved)
-# TODO: implement
+# Step 32 - sample_action_sequences
+def sample_action_sequences(n_sequences, horizon, n_actions):
+    # TODO: Sample random discrete action sequences for random-shooting MPC...
+    return torch.randint(0, n_actions, (n_sequences, horizon))
 
 # Step 33 - score_action_sequences (not yet solved)
 # TODO: implement
