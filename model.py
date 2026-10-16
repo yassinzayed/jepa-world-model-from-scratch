@@ -328,6 +328,7 @@ def init_linear_probe(latent_dim: int = 32, state_dim: int = 2, seed: int = 0) -
 def train_linear_probe(embeddings: torch.Tensor, states: torch.Tensor, probe_params: dict, num_steps: int = 100, lr: float = 1e-2) -> dict:
     # TODO: Train the linear probe via MSE regression from frozen embeddings to true agent states.
     w, b = probe_params['w'].clone().detach().requires_grad_(True), probe_params['b'].clone().detach().requires_grad_(True)
+    embeddings = embeddings.detach()
     for i in range(num_steps):
         pred = embeddings @ w + b
         loss = torch.mean((pred-states)**2)
@@ -346,14 +347,23 @@ def train_linear_probe(embeddings: torch.Tensor, states: torch.Tensor, probe_par
 def probe_state_recovery(dataset: dict, encoder_params: dict, probe_params: dict | None = None, num_probe_steps: int = 100) -> dict:
     # TODO: Encode observations, train linear probe, report state recovery metrics
     observations, states = dataset['observations'], dataset['states']
-    embeddings = encode_batch(observations, encoder_params)
+    with torch.no_grad():
+        embeddings = encode_batch(observations, encoder_params)
     if probe_params is None:
         probe_params = init_linear_probe(latent_dim=embeddings.shape[1], state_dim=states.shape[-1], seed=0)
+    '''if probe_params['w'].shape != (embeddings.shape[1], states.shape[-1]):
+        probe_params = {
+            **probe_params,
+            'w': probe_params['w'].T.contiguous()
+        }'''
     probe_params = train_linear_probe(embeddings, states, probe_params, num_probe_steps, lr=1e-2)
-    pred = embeddings @ probe_params['w'] + probe_params['b']
+    with torch.no_grad():
+        pred = embeddings @ probe_params['w'] + probe_params['b']
+        mse = torch.mean((pred - states)**2).item()
+        mae = torch.mean(torch.abs(pred - states)).item()
     return {
-        'mse': torch.mean(((pred - states)**2)),
-        'mean_abs_error': torch.mean(torch.abs(pred-states)),
+        'mse': mse,
+        'mean_abs_error': mae,
         'probe_params': probe_params
     }
 
