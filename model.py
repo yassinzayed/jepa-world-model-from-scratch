@@ -348,7 +348,7 @@ def probe_state_recovery(dataset: dict, encoder_params: dict, probe_params: dict
     observations, states = dataset['observations'], dataset['states']
     embeddings = encode_batch(observations, encoder_params)
     if probe_params is None:
-        probe_params = init_linear_probe()
+        probe_params = init_linear_probe(latent_dim=embeddings.shape[1], state_dim=states.shape[-1], seed=0)
     probe_params = train_linear_probe(embeddings, states, probe_params, num_probe_steps, lr=1e-2)
     pred = embeddings @ probe_params['w'] + probe_params['b']
     return {
