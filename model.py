@@ -153,8 +153,10 @@ def predictor_forward(embeddings: torch.Tensor, actions: torch.Tensor, predictor
     res2 = torch.nn.functional.linear(res1, predictor_params['fc2_w'], predictor_params['fc2_b'])
     return res2
 
-# Step 16 - predict_next_embedding (not yet solved)
-# TODO: implement
+# Step 16 - predict_next_embedding
+def predict_next_embedding(embeddings: torch.Tensor, actions: torch.Tensor, predictor_params: dict) -> torch.Tensor:
+    # TODO: Predict the next latent embedding given current embeddings and actions...
+    return predictor_forward(embeddings, actions, predictor_params)
 
 # Step 17 - prediction_loss
 def prediction_loss(predicted: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
