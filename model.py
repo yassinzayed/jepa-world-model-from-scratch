@@ -120,8 +120,20 @@ def encoder_forward(obs: torch.Tensor, encoder_params: dict) -> torch.Tensor:
     res = F.linear(res2, weight=encoder_params['fc_w'], bias=encoder_params['fc_b'])
     return res
 
-# Step 10 - init_target_encoder (not yet solved)
-# TODO: implement
+# Step 10 - init_target_encoder
+def init_target_encoder(encoder_params: dict) -> dict:
+    # TODO: Create the EMA target encoder by deep-copying the online encoder params.
+    if not(encoder_params):
+        return {}
+    else:
+        return {
+            'conv1_w': encoder_params['conv1_w'].detach().clone(),
+            'conv1_b': encoder_params['conv1_b'].detach().clone(),
+            'conv2_w': encoder_params['conv2_w'].detach().clone(),
+            'conv2_b': encoder_params['conv2_b'].detach().clone(),
+            'fc_w': encoder_params['fc_w'].detach().clone(),
+            'fc_b':encoder_params['fc_b'].detach().clone()
+        }
 
 # Step 11 - ema_update (not yet solved)
 # TODO: implement
