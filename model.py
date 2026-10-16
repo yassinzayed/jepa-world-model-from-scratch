@@ -303,8 +303,6 @@ def multi_step_prediction_error(dataset: dict, encoder_params: dict, target_para
     obs, action, next_obs = dataset['observations'], dataset['actions'], dataset['next_observations']
     n = len(obs)
     b = min(num_samples, n-horizon+1)
-    #if b <= 0:
-    #    raise ValueError()
     with torch.no_grad():
         ini_obs = obs[:b]
         actions = torch.stack([action[i:i+horizon] for i in range(b)], dim=0)
