@@ -313,8 +313,20 @@ def train_linear_probe(embeddings: torch.Tensor, states: torch.Tensor, probe_par
         'b': b.detach().clone()
     }
 
-# Step 29 - probe_state_recovery (not yet solved)
-# TODO: implement
+# Step 29 - probe_state_recovery
+def probe_state_recovery(dataset: dict, encoder_params: dict, probe_params: dict | None = None, num_probe_steps: int = 100) -> dict:
+    # TODO: Encode observations, train linear probe, report state recovery metrics
+    observations, states = dataset['observations'], dataset['states']
+    embeddings = encode_batch(observations, encoder_params)
+    if probe_params is None:
+        probe_params = init_linear_probe()
+    probe_params = train_linear_probe(embeddings, states, probe_params, num_probe_steps, lr=1e-2)
+    pred = embeddings @ probe_params['w'] + probe_params['b']
+    return {
+        'mse': torch.mean(((pred - states)**2)),
+        'mean_abs_error': torch.mean(torch.abs(pred-states)),
+        'probe_params': probe_params
+    }
 
 # Step 30 - encode_goal
 def encode_goal(goal_state: torch.Tensor, encoder_params: dict, room_size: int = 8) -> torch.Tensor:
@@ -333,8 +345,10 @@ def encode_goal(goal_state: torch.Tensor, encoder_params: dict, room_size: int =
 # Step 33 - score_action_sequences (not yet solved)
 # TODO: implement
 
-# Step 34 - select_best_plan (not yet solved)
-# TODO: implement
+# Step 34 - select_best_plan
+def select_best_plan(action_sequences, costs):
+    # TODO: Return the action sequence with the lowest cost from the candidates.
+    return action_sequences[torch.argmin(costs)]
 
 # Step 35 - mpc_step (not yet solved)
 # TODO: implement

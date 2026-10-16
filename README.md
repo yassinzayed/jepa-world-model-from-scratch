@@ -38,12 +38,12 @@ python scaffold.py
 - [ ] **26.** multi_step_prediction_error
 - [x] **27.** init_linear_probe
 - [x] **28.** train_linear_probe
-- [ ] **29.** probe_state_recovery
+- [x] **29.** probe_state_recovery
 - [x] **30.** encode_goal
 - [ ] **31.** latent_cost
 - [ ] **32.** sample_action_sequences
 - [ ] **33.** score_action_sequences
-- [ ] **34.** select_best_plan
+- [x] **34.** select_best_plan
 - [ ] **35.** mpc_step
 - [ ] **36.** run_mpc_episode
 - [ ] **37.** evaluate_planner
