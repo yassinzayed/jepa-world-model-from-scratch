@@ -115,9 +115,9 @@ def init_encoder_params(obs_channels: int = 1, room_size: int = 8, latent_dim: i
 # Step 9 - encoder_forward
 def encoder_forward(obs: torch.Tensor, encoder_params: dict) -> torch.Tensor:
     # TODO: Run a small two-layer CNN that maps pixel observations to latent embeddings.
-    res1 = F.relu(F.conv2d(obs, weight=encoder_params['conv1_w'], bias=encoder_params['conv1_b'], stride=1, padding=1))
-    res2 = F.relu(F.conv2d(res1, weight=encoder_params['conv2_w'], bias=encoder_params['conv2_b'], stride=2, padding=1)).flatten(1)
-    res = F.linear(res2, weight=encoder_params['fc_w'], bias=encoder_params['fc_b'])
+    res1 = torch.nn.functional.relu(F.conv2d(obs, weight=encoder_params['conv1_w'], bias=encoder_params['conv1_b'], stride=1, padding=1))
+    res2 = torch.nn.functional.relu(F.conv2d(res1, weight=encoder_params['conv2_w'], bias=encoder_params['conv2_b'], stride=2, padding=1)).flatten(1)
+    res = torch.nn.functional.linear(res2, weight=encoder_params['fc_w'], bias=encoder_params['fc_b'])
     return res
 
 # Step 10 - init_target_encoder
@@ -222,8 +222,44 @@ def collapse_metric(embeddings: torch.Tensor) -> torch.Tensor:
     # TODO: Measure collapse as the mean of per-dimension batch stds
     return embeddings.std(dim=0).mean()
 
-# Step 23 - jepa_training_step (not yet solved)
-# TODO: implement
+# Step 23 - jepa_training_step
+def jepa_training_step(batch: dict, encoder_params: dict, target_params: dict, predictor_params: dict, lr: float = 1e-3, tau: float = 0.99) -> tuple[dict, dict, dict, float, float]:
+    # TODO: Perform one full JEPA gradient update on a batch of transitions
+    encoder_params = {
+        k: p.detach().requires_grad_(True)
+        for k, p in encoder_params.items()
+    }
+    predictor_params = {
+        k: p.detach().requires_grad_(True)
+        for k, p in predictor_params.items()
+    }
+    online_enc = encode_batch(batch['observations'], encoder_params)
+    with torch.no_grad():
+        target = encode_batch(batch['next_observations'], target_params)
+    predicted = predict_next_embedding(online_enc, batch['actions'], predictor_params)
+    loss = jepa_loss(predicted, target, online_enc)
+    loss.backward()
+        # SGD updates
+    updated_encoder = {
+        k: (p - lr * p.grad).detach().requires_grad_(True)
+        if p.grad is not None else p.detach().requires_grad_(True)
+        for k, p in encoder_params.items()
+    }
+    updated_predictor = {
+        k: (p - lr * p.grad).detach().requires_grad_(True)
+        if p.grad is not None else p.detach().requires_grad_(True)
+        for k, p in predictor_params.items()
+    }
+    target_params = ema_update(target_params, updated_encoder, tau)
+    updated_target = ema_update(target_params, updated_encoder, tau)
+    collapse_value = collapse_metric(online_enc.detach()).item()
+    return (
+        updated_encoder,
+        updated_target,
+        updated_predictor,
+        loss.item(),
+        collapse_value
+    )
 
 # Step 24 - train_jepa (not yet solved)
 # TODO: implement
