@@ -404,8 +404,30 @@ def mpc_step(start_embedding, goal_embedding, predictor_params, n_sequences, hor
     best_plan = select_best_plan(action_sequences, cost_list)
     return int(best_plan[0])
 
-# Step 36 - run_mpc_episode (not yet solved)
-# TODO: implement
+# Step 36 - run_mpc_episode
+def run_mpc_episode(encoder_params, predictor_params, goal_pos, room_size, agent_size, max_steps, n_sequences, horizon, n_actions):
+    # TODO: Run a closed-loop random-shooting MPC episode toward a goal position.
+    goal_embedding = encode_goal(goal_pos, encoder_params, room_size=room_size)
+    state, obs = env_reset(room_size=room_size)
+    trajectory = [(float(state[0]), float(state[1]))]
+    steps = 0
+    success = False
+    for i in range(max_steps):
+        if int(state[0]) == int(goal_pos[0]) and int(state[1]) == int(goal_pos[1]):
+            success = True
+            break
+        current_emb = encode_batch(obs.unsqueeze(0), encoder_params).squeeze(0)
+        action = mpc_step(current_emb, goal_embedding, predictor_params, n_sequences, horizon, n_actions)
+        state, obs = env_step(state, action, room_size=room_size)
+        trajectory.append((float(state[0]), float(state[1])))
+        steps += 1
+    final_distance = float(((float(state[0]) - goal_pos[0]) ** 2 + (float(state[1]) - goal_pos[1]) ** 2)**0.5)
+    return {
+        'success': success,
+        'steps': steps,
+        'trajectory': trajectory,
+        'final_distance': final_distance,
+    }
 
 # Step 37 - evaluate_planner (not yet solved)
 # TODO: implement
