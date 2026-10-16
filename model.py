@@ -331,8 +331,7 @@ def probe_state_recovery(dataset: dict, encoder_params: dict, probe_params: dict
 # Step 30 - encode_goal
 def encode_goal(goal_state: torch.Tensor, encoder_params: dict, room_size: int = 8) -> torch.Tensor:
     # TODO: Convert a desired agent position into a latent goal embedding.
-    observation = render_observation(goal_state, room_size)
-    observation.unsqueeze(0)
+    observation = render_observation(goal_state, room_size).unsqueeze(0)
     observation = encoder_forward(observation, encoder_params)
     return observation.squeeze(0)
 
